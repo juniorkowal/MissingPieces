@@ -100,7 +100,6 @@
     <Compile Include="PluginConfig.cs" />
     <Compile Include="PluginExtensions.cs" />
     <Compile Include="Requirements.cs" />
-    <Compile Include="Patches\ArmorStandPatch.cs" />
     <Compile Include="Patches\PiecePatch.cs" />
     <Compile Include="Patches\PlayerPatch.cs" />
     <Compile Include="Patches\ZoneSystemPatch.cs" />

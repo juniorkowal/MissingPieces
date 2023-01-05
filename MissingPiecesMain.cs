@@ -55,11 +55,15 @@ namespace MissingPieces
 				_logger.LogError($"Could not find HammerPieceTable!");
 				yield break;
 			}
+
 			_standardPrefabIconSprite = _standardPrefabIconSprite ??= CreateColorSprite(new Color32(34, 132, 73, 64));
 			_prefabIconRenderRotation = Quaternion.Euler(0f, -45f, 0f);
-			foreach (KeyValuePair<string, Dictionary<string, int>> item in Requirements.hammerCreatorShopItems.OrderBy((KeyValuePair<string, Dictionary<string, int>> o) => o.Key).ToList())
+
+			foreach (var item in Requirements.hammerCreatorShopItems.OrderBy(o => o.Key).ToList())
 			{
-				GetOrAddPieceComponent(item.Key, pieceTable).SetResources(CreateRequirements(item.Value)).SetCategory(_prefabPieceCategory).SetCraftingStation(GetCraftingStation(item.Key))
+				var piece = GetOrAddPieceComponent(item.Key, pieceTable);
+				piece.SetResources(CreateRequirements(item.Value)).SetCategory(_prefabPieceCategory)
+					.SetCraftingStation(GetCraftingStation(item.Key))
 					.SetCanBeRemoved(canBeRemoved: true)
 					.SetTargetNonPlayerBuilt(canTarget: false);
 			}
@@ -67,16 +71,16 @@ namespace MissingPieces
 
 		private static Piece.Requirement[] CreateRequirements(Dictionary<string, int> data)
 		{
-			Piece.Requirement[] array = new Piece.Requirement[data.Count];
+			var requirements = new Piece.Requirement[data.Count];
 			for (int i = 0; i < data.Count; i++)
 			{
 				KeyValuePair<string, int> keyValuePair = data.ElementAt(i);
-				Piece.Requirement requirement = new Piece.Requirement();
+				var requirement = new Piece.Requirement();
 				requirement.m_resItem = PrefabManager.Cache.GetPrefab<GameObject>(keyValuePair.Key).GetComponent<ItemDrop>();
 				requirement.m_amount = keyValuePair.Value;
-				array[i] = requirement;
+				requirements[i] = requirement;
 			}
-			return array;
+			return requirements;
 		}
 
 		static PieceTable GetPieceTable(string pieceTableName) 
@@ -95,17 +99,17 @@ namespace MissingPieces
 		private static Piece GetOrAddPieceComponent(string prefabName, PieceTable pieceTable)
 		{
 			GameObject prefab = ZNetScene.instance.GetPrefab(prefabName);
-			if (!prefab.TryGetComponent(out Piece piece))
+			Piece piece;
+			if (!prefab.TryGetComponent(out piece))
 			{
 				piece = prefab.AddComponent<Piece>();
 				piece.m_name = FormatPrefabName(prefab.name);
 
 				SetPlacementRestrictions(piece);
 			}
-			Piece piece2 = piece;
-			if (piece2.m_icon == null)
+			if (piece.m_icon == null)
 			{
-				piece2.m_icon = LoadOrRenderIcon(prefab, _prefabIconRenderRotation, _standardPrefabIconSprite);
+				piece.m_icon = LoadOrRenderIcon(prefab, _prefabIconRenderRotation, _standardPrefabIconSprite);
 			}
 			if (!pieceTable.m_pieces.Contains(prefab))
 			{
@@ -120,8 +124,7 @@ namespace MissingPieces
 
 		private static string FormatPrefabName(string prefabName)
 		{
-			return PrefabNameRegex.Replace(prefabName, "$1 $2").TrimStart(' ').Replace('_', ' ')
-				.Replace("  ", " ");
+			return PrefabNameRegex.Replace(prefabName, "$1 $2").TrimStart(' ').Replace('_', ' ').Replace("  ", " ");
 		}
 
 		static Sprite LoadOrRenderIcon(GameObject prefab, Quaternion renderRotation, Sprite defaultSprite)

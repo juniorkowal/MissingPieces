@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
-using UnityEngine;
 
 
 public static class PieceExtensions
 {
 	public static Piece AddPlantComponent(this Piece piece)
 	{
-		((Component)piece).GetComponent<Plant>();
+        piece.GetComponent<Plant>();
 		return piece;
 	}
 
