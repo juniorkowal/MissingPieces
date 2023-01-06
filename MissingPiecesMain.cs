@@ -34,6 +34,7 @@ namespace MissingPieces
 		{
 			_logger = Logger;
 			PluginConfig.BindConfig(Config);
+			Requirements.LoadRequirements();
 			_harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), PLUGIN_GUID);
 			_prefabPieceCategory = PieceManager.Instance.AddPieceCategory("_HammerPieceTable", "Other");
 		}
